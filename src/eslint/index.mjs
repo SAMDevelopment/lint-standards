@@ -1,3 +1,5 @@
+import { plugin } from "./plugin.mjs";
 import { createConfig } from "./config.mjs";
 
-export { createConfig };
+export { plugin, createConfig };
+export default plugin;

@@ -1,17 +1,15 @@
 import tseslint from "typescript-eslint";
 import nodePlugin from "eslint-plugin-n";
 import testingLibrary from "eslint-plugin-testing-library";
+import { plugin } from "./plugin.mjs";
 
-const SOURCE_FILES = ["**/*.{ts,tsx,mts,cts,js,jsx,mjs,cjs}"];
-const TYPESCRIPT_FILES = ["**/*.{ts,tsx,mts,cts}"];
-const DEFAULT_TEST_FILES = ["**/*.{test,spec}.{ts,tsx,js,jsx,mjs,cjs}"];
-
-export function createConfig(options = {}) {
+function createConfig(options = {}) {
   const {
     configFiles = [],
     testUtilsFiles = [],
     testUtilsModule,
     testFiles = DEFAULT_TEST_FILES,
+    stepdown = {},
   } = options;
 
   return [
@@ -20,8 +18,11 @@ export function createConfig(options = {}) {
     environmentOnlyInConfig(configFiles),
     testingLibraryImportsOnlyInWrapper(testUtilsFiles),
     testingLibraryRules(testFiles, testUtilsModule),
+    ownRules(stepdown),
   ];
 }
+
+const DEFAULT_TEST_FILES = ["**/*.{test,spec}.{ts,tsx,js,jsx,mjs,cjs}"];
 
 function typescriptParser() {
   return {
@@ -30,6 +31,8 @@ function typescriptParser() {
     languageOptions: { parser: tseslint.parser },
   };
 }
+
+const TYPESCRIPT_FILES = ["**/*.{ts,tsx,mts,cts}"];
 
 function productionTypeAssertions(testFiles) {
   return {
@@ -53,6 +56,8 @@ function environmentOnlyInConfig(configFiles) {
     rules: { "n/no-process-env": "error" },
   };
 }
+
+const SOURCE_FILES = ["**/*.{ts,tsx,mts,cts,js,jsx,mjs,cjs}"];
 
 function testingLibraryImportsOnlyInWrapper(testUtilsFiles) {
   return {
@@ -91,3 +96,17 @@ function testingLibraryRules(testFiles, testUtilsModule) {
     },
   };
 }
+
+function ownRules(stepdown) {
+  return {
+    name: "lint-standards/own-rules",
+    files: SOURCE_FILES,
+    plugins: { "lint-standards": plugin },
+    rules: {
+      "lint-standards/no-comments": "error",
+      "lint-standards/stepdown": ["error", stepdown],
+    },
+  };
+}
+
+export { createConfig };

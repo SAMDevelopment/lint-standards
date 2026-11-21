@@ -3,12 +3,6 @@ import assert from "node:assert/strict";
 import { ESLint } from "eslint";
 import { createConfig } from "../src/eslint/index.mjs";
 
-const options = {
-  configFiles: ["src/config/**", "**/vitest.config.ts"],
-  testUtilsFiles: ["src/test/test-utils.tsx"],
-  testUtilsModule: "test/test-utils",
-};
-
 test("type assertions are banned in production but allowed in tests", async () => {
   const production = "const a = value as string;\nconst b = value!;\nconst c = [1] as const;\n";
   assert.deepEqual(await rules("src/a.ts", production), [
@@ -43,5 +37,11 @@ test("user-event interactions are awaited and preferred over fireEvent", async (
 async function rules(filePath, code) {
   const eslint = new ESLint({ cwd: process.cwd(), overrideConfigFile: true, overrideConfig: createConfig(options) });
   const [result] = await eslint.lintText(code, { filePath });
-  return result.messages.map((message) => message.ruleId);
+  return result.messages.map((message) => message.ruleId).filter((ruleId) => !ruleId.startsWith("lint-standards/"));
 }
+
+const options = {
+  configFiles: ["src/config/**", "**/vitest.config.ts"],
+  testUtilsFiles: ["src/test/test-utils.tsx"],
+  testUtilsModule: "test/test-utils",
+};

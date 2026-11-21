@@ -1,13 +1,20 @@
 const SPACING_PROPERTIES = "/^(padding|gap|row-gap|column-gap|grid-gap|grid-row-gap|grid-column-gap)(-|$)/";
+
 const MARGIN_PROPERTIES = "/^margin(-|$)/";
+
 const FONT_PROPERTIES = "/^font(-|$)/";
+
 const COLOR_PROPERTIES = "/(^|-)color$/";
+
 const COLOR_FUNCTIONS = ["rgb", "rgba", "hsl", "hsla", "hwb", "lab", "lch", "oklab", "oklch", "color", "color-mix"];
 
 const DEFAULT_ALLOWED_FONT_VALUES = ["inherit", "initial", "unset", "revert"];
+
 const DEFAULT_ALLOWED_COLOR_VALUES = ["inherit", "initial", "unset", "revert", "transparent", "currentColor"];
 
-export function createStylelintConfig(options = {}) {
+export default createStylelintConfig();
+
+function createStylelintConfig(options = {}) {
   const {
     allowedFontValues = DEFAULT_ALLOWED_FONT_VALUES,
     allowedColorValues = DEFAULT_ALLOWED_COLOR_VALUES,
@@ -41,4 +48,4 @@ function escapePattern(text) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-export default createStylelintConfig();
+export { createStylelintConfig };
