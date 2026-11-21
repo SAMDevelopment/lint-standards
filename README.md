@@ -10,7 +10,7 @@ There is no build step. Install it as a git dependency pinned to a tag.
 ## Install
 
 ```sh
-npm i -D github:SAMDevelopment/lint-standards#v1.0.0
+npm i -D github:SAMDevelopment/lint-standards#v1.0.1
 ```
 
 Requires ESLint 9 or 10 and TypeScript. Stylelint 16 or later is only needed for the stylelint config. typescript-eslint, eslint-plugin-n and eslint-plugin-testing-library are installed with it. Pin a tag rather than a branch; upgrading means changing the tag.
