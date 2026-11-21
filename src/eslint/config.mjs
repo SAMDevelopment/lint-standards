@@ -53,7 +53,17 @@ function environmentOnlyInConfig(configFiles) {
     files: SOURCE_FILES,
     ignores: configFiles,
     plugins: { n: nodePlugin },
-    rules: { "n/no-process-env": "error" },
+    rules: {
+      "n/no-process-env": "error",
+      "no-restricted-properties": [
+        "error",
+        {
+          object: "Deno",
+          property: "env",
+          message: "Read environment variables only in the config modules.",
+        },
+      ],
+    },
   };
 }
 

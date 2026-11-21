@@ -10,7 +10,7 @@ There is no build step. Install it as a git dependency pinned to a tag.
 ## Install
 
 ```sh
-npm i -D github:SAMDevelopment/lint-standards#v1.0.2
+npm i -D github:SAMDevelopment/lint-standards#v1.0.3
 ```
 
 Requires ESLint 9 or 10 and TypeScript. Stylelint 16 or later is only needed for the stylelint config. typescript-eslint, eslint-plugin-n and eslint-plugin-testing-library are installed with it. Pin a tag rather than a branch; upgrading means changing the tag.
@@ -50,6 +50,7 @@ The plugin is also the default export for use without the factory (`plugins: { "
 | `@typescript-eslint/consistent-type-assertions` (`assertionStyle: never`) | typescript-eslint | No `as` casts in production code. `as const` is allowed. Tests exempt. |
 | `@typescript-eslint/no-non-null-assertion` | typescript-eslint | No non-null `!` in production code. Tests exempt. |
 | `n/no-process-env` | eslint-plugin-n | `process.env` only in `configFiles`. Also catches assigning to the env in tests. |
+| `no-restricted-properties` | ESLint | `Deno.env` (`get`, `toObject`, ...) only in `configFiles`. |
 | `no-restricted-imports` | ESLint | `@testing-library/react` and `@testing-library/user-event` only in `testUtilsFiles`. |
 | `testing-library/await-async-events` (`eventModule: userEvent`) | eslint-plugin-testing-library | userEvent interactions are awaited. |
 | `testing-library/prefer-user-event` | eslint-plugin-testing-library | userEvent instead of fireEvent. |
@@ -72,7 +73,7 @@ The fix rewrites the whole file layout in one pass and is skipped if it could no
 
 #### `lint-standards/no-comments`
 
-Bans every comment. Allowed: `eslint-disable`, `eslint-disable-line`, `eslint-disable-next-line`, `eslint-enable`, `@ts-expect-error`, `@ts-ignore` comments, and a license header at the very top of the file (a leading comment group mentioning copyright, license or SPDX). There is no JSDoc exemption. Text after a directive (`-- reason`) is not policed.
+Bans every comment. Allowed: `eslint-disable`, `eslint-disable-line`, `eslint-disable-next-line`, `eslint-enable`, `@ts-expect-error`, `@ts-ignore` comments, test environment pragmas (`// @vitest-environment jsdom`, `@jest-environment`), and a license header at the very top of the file (a leading comment group mentioning copyright, license or SPDX). There is no JSDoc exemption. Text after a directive (`-- reason`) is not policed.
 
 ## stylelint
 
@@ -90,7 +91,7 @@ Or `{ "extends": ["@samdevelopment/lint-standards/stylelint"] }` for the default
 
 - `margin*`: only `auto` and `0`.
 - `padding*`, `gap`, `row-gap`, `column-gap`: no raw `px`. Use tokens (CSS variables).
-- `font*`: only token functions (`var(...)`) and the allowed keywords.
+- `font*`: only token functions (`var(...)`) and the allowed keywords. `font-style` also accepts `normal`, `italic` and `oblique`.
 - Colors: `*color` properties accept only token functions and the allowed keywords; hex, named colors and color functions (`rgb`, `hsl`, ...) are banned everywhere.
 
 stylelint only sees plain CSS. For CSS-in-JS (Linaria, styled components) the consuming repo needs a custom syntax such as `postcss-styled-syntax` and must check that interpolated tokens still look like `var(--x)`.

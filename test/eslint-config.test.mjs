@@ -21,6 +21,12 @@ test("environment is read only in the configured config files", async () => {
   assert.deepEqual(await rules("src/a.test.ts", "process.env.URL = 'x';\n"), ["n/no-process-env"]);
 });
 
+test("Deno.env is read only in the configured config files", async () => {
+  const code = "export const a = Deno.env.get('A');\nexport const b = Deno.env.toObject();\n";
+  assert.deepEqual(await rules("src/a.ts", code), ["no-restricted-properties", "no-restricted-properties"]);
+  assert.deepEqual(await rules("src/config/server.ts", code), []);
+});
+
 test("testing library is imported only through the wrapper", async () => {
   const code = "import { render } from '@testing-library/react';\nimport userEvent from '@testing-library/user-event';\nexport { render, userEvent };\n";
   assert.deepEqual(await rules("src/a.test.tsx", code), ["no-restricted-imports", "no-restricted-imports"]);

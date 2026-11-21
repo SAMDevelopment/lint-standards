@@ -2,7 +2,9 @@ const SPACING_PROPERTIES = "/^(padding|gap|row-gap|column-gap|grid-gap|grid-row-
 
 const MARGIN_PROPERTIES = "/^margin(-|$)/";
 
-const FONT_PROPERTIES = "/^font(-|$)/";
+const FONT_PROPERTIES = "/^font(?!-style$)(-|$)/";
+const FONT_STYLE_PROPERTY = "font-style";
+const FONT_STYLE_KEYWORDS = ["normal", "italic", "oblique"];
 
 const COLOR_PROPERTIES = "/(^|-)color$/";
 
@@ -26,6 +28,7 @@ function createStylelintConfig(options = {}) {
       "declaration-property-value-allowed-list": {
         [MARGIN_PROPERTIES]: ["/^(auto|0)( (auto|0)){0,3}$/"],
         [FONT_PROPERTIES]: allowList(allowedFontValues, tokenFunctions),
+        [FONT_STYLE_PROPERTY]: allowList([...allowedFontValues, ...FONT_STYLE_KEYWORDS], tokenFunctions, true),
         [COLOR_PROPERTIES]: allowList(allowedColorValues, tokenFunctions),
       },
       "declaration-property-value-disallowed-list": {
@@ -38,10 +41,11 @@ function createStylelintConfig(options = {}) {
   };
 }
 
-function allowList(values, tokenFunctions) {
+function allowList(values, tokenFunctions, allowArguments = false) {
   const tokens = tokenFunctions.map((name) => `${escapePattern(name)}\\(`).join("|");
   const keywords = values.map(escapePattern).join("|");
-  return [`/^(${keywords})$/`, `/^(${tokens})/`];
+  const tail = allowArguments ? "( .+)?" : "";
+  return [`/^(${keywords})${tail}$/`, `/^(${tokens})/`];
 }
 
 function escapePattern(text) {

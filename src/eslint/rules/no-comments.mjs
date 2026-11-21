@@ -20,7 +20,7 @@ const noComments = {
 
         for (const comment of comments) {
           if (header.has(comment)) continue;
-          if (TOOLING_DIRECTIVE.test(comment.value)) continue;
+          if (TOOLING_DIRECTIVE.test(comment.value) || ENVIRONMENT_PRAGMA.test(comment.value)) continue;
           context.report({ loc: comment.loc, messageId: "noComment" });
         }
       },
@@ -59,5 +59,7 @@ const LICENSE_HEADER = /copyright|licen[sc]e|SPDX-License-Identifier/i;
 
 const TOOLING_DIRECTIVE =
   /^\s*(eslint-disable(-next-line|-line)?|eslint-enable|@ts-expect-error|@ts-ignore)(\s|$)/;
+
+const ENVIRONMENT_PRAGMA = /^\s*\*?\s*@(vitest|jest)-environment(\s|$)/;
 
 export { noComments };

@@ -27,6 +27,12 @@ test("font properties accept only tokens and configured keywords", async () => {
   ]);
 });
 
+test("font-style accepts its keywords", async () => {
+  assert.deepEqual(await lint("a { font-style: italic; font-style: normal; font-style: oblique 10deg; font-style: inherit; }"), []);
+  assert.deepEqual(await lint("a { font-style: bold; }"), ["font-style"]);
+  assert.deepEqual(await lint("a { font-weight: italic; }"), ["font-weight"]);
+});
+
 test("color values accept only tokens and configured keywords", async () => {
   assert.deepEqual(await lint("a { color: var(--color-text); background-color: transparent; border-color: currentColor; }"), []);
   assert.deepEqual(await lint("a { color: red; }"), ["color-named", "color"]);
