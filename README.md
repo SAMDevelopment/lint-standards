@@ -1,33 +1,19 @@
 # lint-standards
 
-Private shared lint package for the owner's coding standards (the mechanical half of `citadel/docs/coding-standards`). It ships:
+Shared ESLint and stylelint configuration for TypeScript and React projects. It ships:
 
-- an ESLint plugin (`stepdown`, `no-comments`) and a shared flat config factory,
-- a shared stylelint config.
+- an ESLint plugin (`stepdown`, `no-comments`) and a flat config factory,
+- a stylelint config.
 
-There is no build step. Repos install it as a git dependency pinned to a tag.
+There is no build step. Install it as a git dependency pinned to a tag.
 
 ## Install
 
 ```sh
-npm install --save-dev "github:SAMDevelopment/lint-standards#v1.0.0"
+npm i -D github:SAMDevelopment/lint-standards#v1.0.0
 ```
 
-The package needs ESLint 9 or 10 (and TypeScript). Stylelint 16 or later is only needed when you use the stylelint config. Everything else (typescript-eslint, eslint-plugin-n, eslint-plugin-testing-library) comes with it.
-
-Upgrading means changing the tag. Never depend on a branch.
-
-### CI access
-
-The repo is private. A consuming repo's CI must be able to clone it during `npm ci`. The npm shortcut `github:` resolves to `git+ssh://git@github.com/...`, so the simplest setup is a read-only deploy key:
-
-1. Create a keypair with no passphrase. Add the public key to this repo as a deploy key (read-only).
-2. Store the private key as an Actions secret in each consuming repo, for example `LINT_STANDARDS_DEPLOY_KEY`.
-3. Load it before install, for example with `webfactory/ssh-agent` (`ssh-private-key: ${{ secrets.LINT_STANDARDS_DEPLOY_KEY }}`).
-
-Alternative: a fine-grained personal access token with read-only Contents access to this repo only, stored as a secret, plus `git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "ssh://git@github.com/"` before install.
-
-Anything else that runs `npm ci` with dev dependencies (for example a Cloudflare or other hosted build) needs the same access.
+Requires ESLint 9 or 10 and TypeScript. Stylelint 16 or later is only needed for the stylelint config. typescript-eslint, eslint-plugin-n and eslint-plugin-testing-library are installed with it. Pin a tag rather than a branch; upgrading means changing the tag.
 
 ## ESLint
 
@@ -53,7 +39,7 @@ Options (all optional):
 | `testFiles` | Globs of test files. Default `**/*.{test,spec}.{ts,tsx,js,jsx,mjs,cjs}`. |
 | `stepdown` | Options for the `stepdown` rule (below). |
 
-There are no exemption lists: fix violations rather than ignoring files. `configFiles` and `testUtilsFiles` are the intended locations, not exceptions.
+The package has no per-file exemption lists; `configFiles` and `testUtilsFiles` name where env access and testing-library imports belong.
 
 The plugin is also the default export for use without the factory (`plugins: { "lint-standards": plugin }`).
 
@@ -76,7 +62,7 @@ The plugin is also the default export for use without the factory (`plugins: { "
 - Helpers (functions, values, types) follow in first-use order, each just below the code that uses it (depth first).
 - A load-time value goes above its first use only where technically required, meaning it is used while the module loads (module-level code, or a `describe` body in a test). Otherwise it goes below, in first-use order. Functions called at load time pull the values they use above too.
 - No big block above the subject, types included. At most one type, at most `maxSubjectTypeLines` lines (default 10), may sit above it, and only if the subject uses it (props or signature).
-- Exports at the bottom: `export { a, b }`, `export default X`, `export type { T }`. Inline `export` on a declaration is reported and auto-converted. Anonymous default exports are left alone.
+- Exports at the bottom: `export { a, b }`, `export default X`, `export type { T }`. Inline `export` on a declaration is reported and auto-converted. Anonymous default exports are left alone. Next.js route segment config exports (`export const dynamic = ...`) may not accept the list form; set `inlineExports: "allow"` in such repos.
 - React order falls out of the above plus one extra: props type, component, helpers, styled components (`styled.x\`\``, `styled(X)\`\``), export.
 - Test files: hoisted `vi.mock`/`vi.hoisted`/`jest.mock` go directly after the imports; helpers and fixtures go below the first `describe`.
 
@@ -103,20 +89,20 @@ export default createStylelintConfig({
 Or `{ "extends": ["@samdevelopment/lint-standards/stylelint"] }` for the defaults.
 
 - `margin*`: only `auto` and `0`.
-- `padding*`, `gap`, `row-gap`, `column-gap`: no raw `px`. Use tokens.
+- `padding*`, `gap`, `row-gap`, `column-gap`: no raw `px`. Use tokens (CSS variables).
 - `font*`: only token functions (`var(...)`) and the allowed keywords.
 - Colors: `*color` properties accept only token functions and the allowed keywords; hex, named colors and color functions (`rgb`, `hsl`, ...) are banned everywhere.
 
 stylelint only sees plain CSS. For CSS-in-JS (Linaria, styled components) the consuming repo needs a custom syntax such as `postcss-styled-syntax` and must check that interpolated tokens still look like `var(--x)`.
 
-## Judgement-only rules (not mechanical)
+## Limits
 
-These standards stay with the reviewer; nothing here enforces them: one fact one field; reuse before creating; component placement; gap vs padding vs margin and the spacer component; raising new tokens with the owner first; keeping rendering components free of data fetching; named exports preferred; moving code as a refactor; test behaviour (no tautological or change-detector tests); one behaviour per test; harnesses; shared behaviour tested through named assertions; narrowing in tests with `assert`; stubbing env in tests with `vi.stubEnv`; whether a spacing value is "the nearest step".
+Some conventions (naming, reuse, test design, and similar) cannot be checked mechanically and are not covered.
 
-## Not implemented
+### Not implemented
 
 - `userEvent.setup()` per test: `testing-library/prefer-user-event-setup` exists but only recognises the literal `@testing-library/user-event` import, so it never fires on a test-utils wrapper (which the import ban requires). Left out.
-- Raw `rem`/`em` spacing is not banned (only `px`, as specified).
+- Raw `rem`/`em` spacing is not banned (only `px`).
 - "Small type describing the subject" is approximated: referenced by the subject and within a line limit.
 
 ## Development
@@ -126,4 +112,4 @@ npm install
 npm test
 ```
 
-Tests use `node:test`, ESLint's `RuleTester` and `stylelint.lint`. To release: update, test, commit, then `git tag vX.Y.Z && git push --tags`.
+Tests use `node:test`, ESLint's `RuleTester` and `stylelint.lint`. To release: test, commit, then `git tag vX.Y.Z && git push --tags`.
