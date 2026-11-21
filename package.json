@@ -1,6 +1,6 @@
 {
   "name": "@samdevelopment/lint-standards",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "private": true,
   "description": "Shared ESLint and stylelint configuration for the owner's coding standards",
   "type": "module",
