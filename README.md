@@ -52,6 +52,7 @@ The plugin is also the default export for use without the factory (`plugins: { "
 | `n/no-process-env` | eslint-plugin-n | `process.env` only in `configFiles`. Also catches assigning to the env in tests. |
 | `no-restricted-properties` | ESLint | `Deno.env` (`get`, `toObject`, ...) only in `configFiles`. |
 | `no-restricted-imports` | ESLint | `@testing-library/react` and `@testing-library/user-event` only in `testUtilsFiles`. |
+| `eqeqeq` (`always`, null ignored) | ESLint | `===` and `!==`, except `== null` / `!= null`. |
 | `testing-library/await-async-events` (`eventModule: userEvent`) | eslint-plugin-testing-library | userEvent interactions are awaited. |
 | `testing-library/prefer-user-event` | eslint-plugin-testing-library | userEvent instead of fireEvent. |
 | `lint-standards/stepdown` | this package | Stepdown order, below. Auto-fixable. |

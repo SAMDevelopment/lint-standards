@@ -40,6 +40,13 @@ test("user-event interactions are awaited and preferred over fireEvent", async (
   assert.ok((await rules("src/a.test.tsx", fire)).includes("testing-library/prefer-user-event"));
 });
 
+test("equality uses strict comparison except for null checks", async () => {
+  const loose = "const a = x == y;\nconst b = x != y;\n";
+  assert.deepEqual(await rules("src/a.ts", loose), ["eqeqeq", "eqeqeq"]);
+  const strict = "const a = x == null;\nconst b = x != null;\nconst c = x === y;\nconst d = x !== y;\n";
+  assert.deepEqual(await rules("src/a.ts", strict), []);
+});
+
 async function rules(filePath, code) {
   const eslint = new ESLint({ cwd: process.cwd(), overrideConfigFile: true, overrideConfig: createConfig(options) });
   const [result] = await eslint.lintText(code, { filePath });
