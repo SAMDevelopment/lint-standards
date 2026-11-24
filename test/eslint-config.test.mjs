@@ -43,6 +43,10 @@ test("user-event interactions are awaited and preferred over fireEvent", async (
 test("equality uses strict comparison except for null checks", async () => {
   const loose = "const a = x == y;\nconst b = x != y;\n";
   assert.deepEqual(await rules("src/a.ts", loose), ["eqeqeq", "eqeqeq"]);
+  assert.deepEqual(await rules("src/a.test.ts", loose), ["eqeqeq", "eqeqeq"]);
+  assert.deepEqual(await rules("src/a.js", loose), ["eqeqeq", "eqeqeq"]);
+  const looseUndefined = "const a = x == undefined;\n";
+  assert.deepEqual(await rules("src/a.ts", looseUndefined), ["eqeqeq"]);
   const strict = "const a = x == null;\nconst b = x != null;\nconst c = x === y;\nconst d = x !== y;\n";
   assert.deepEqual(await rules("src/a.ts", strict), []);
 });
