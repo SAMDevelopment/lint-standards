@@ -17,6 +17,7 @@ function createConfig(options = {}) {
     productionTypeAssertions(testFiles),
     environmentOnlyInConfig(configFiles),
     testingLibraryImportsOnlyInWrapper(testUtilsFiles),
+    strictEquality(),
     testingLibraryRules(testFiles, testUtilsModule),
     ownRules(stepdown),
   ];
@@ -90,6 +91,16 @@ function testingLibraryImportsOnlyInWrapper(testUtilsFiles) {
           ],
         },
       ],
+    },
+  };
+}
+
+function strictEquality() {
+  return {
+    name: "lint-standards/strict-equality",
+    files: SOURCE_FILES,
+    rules: {
+      eqeqeq: ["error", "always", { null: "ignore" }],
     },
   };
 }
